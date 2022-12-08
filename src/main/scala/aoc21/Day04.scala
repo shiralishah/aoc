@@ -18,7 +18,7 @@ object Day04A extends App {
       (boards, board :+ line.split(' ').filter(_.nonEmpty).map(_.toInt))
   } match {
     case (boards, board) if board.nonEmpty => boards :+ Board(board)
-    case (boards, _)  => boards
+    case (boards, _)                       => boards
   }
 
   val score = findWin(0)
@@ -29,8 +29,8 @@ object Day04A extends App {
   def findWin(callNum: Int): Int = {
     val called = calls.take(callNum)
     boards.find(_.hasWin(called)) match {
-      case Some(board) => board.unmarkedSum(called)*called.reverse.head
-      case None => findWin(callNum+1)
+      case Some(board) => board.unmarkedSum(called) * called.reverse.head
+      case None        => findWin(callNum + 1)
     }
   }
 
@@ -46,7 +46,7 @@ object Day04B extends App {
       (boards, board :+ line.split(' ').filter(_.nonEmpty).map(_.toInt))
   } match {
     case (boards, board) if board.nonEmpty => boards :+ Board(board)
-    case (boards, _)  => boards
+    case (boards, _)                       => boards
   }
 
   val score = findLastWin(0)
@@ -57,8 +57,8 @@ object Day04B extends App {
   def findLastWin(callNum: Int): Int = {
     val called = calls.dropRight(callNum)
     boards.find(!_.hasWin(called.dropRight(1))) match {
-      case Some(board) => (board.unmarkedSum(called))*called.reverse.head
-      case None => findLastWin(callNum+1)
+      case Some(board) => (board.unmarkedSum(called)) * called.reverse.head
+      case None        => findLastWin(callNum + 1)
     }
   }
 
