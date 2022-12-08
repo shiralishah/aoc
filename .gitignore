@@ -2,4 +2,5 @@ project/project
 target
 .bsp
 .idea
-project
+project\
+*.txt
