@@ -3,10 +3,10 @@ package aoc22
 import aoc22.Day08A.input
 
 object Day08A extends App {
-  val input  = scala.io.Source.fromResource("aoc22/day08.txt").getLines().map(_.toCharArray.map(_.asDigit)).toArray
-  val width  = input.head.length
-  val height = input.length
-  val base   = 2 * (width - 1) + 2 * (height - 1)
+  val input   = scala.io.Source.fromResource("aoc22/day08.txt").getLines().map(_.toCharArray.map(_.asDigit)).toArray
+  val width   = input.head.length
+  val height  = input.length
+  val base    = 2 * (width - 1) + 2 * (height - 1)
   val inverse = input.transpose
 
   val visibility = (1 until (height - 1)).flatMap { y =>
@@ -24,9 +24,9 @@ object Day08A extends App {
 }
 
 object Day08B extends App {
-  val input  = scala.io.Source.fromResource("aoc22/day08.txt").getLines().map(_.toCharArray.map(_.asDigit)).toArray
-  val width  = input.head.length
-  val height = input.length
+  val input   = scala.io.Source.fromResource("aoc22/day08.txt").getLines().map(_.toCharArray.map(_.asDigit)).toArray
+  val width   = input.head.length
+  val height  = input.length
   val inverse = input.transpose
 
   val maxScore = (0 until height).flatMap { y =>
