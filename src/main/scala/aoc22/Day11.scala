@@ -146,7 +146,7 @@ object Day11B extends App {
         monkeyMap.updated(monk.num, monk)
     }
 
-  val divisors = tempMonkey.values.map(_.test.check.v).toSeq
+  val divisors = tempMonkey.values.toSeq.sortBy(_.num).map(_.test.check.v)
   val monkeyStart = tempMonkey.foldLeft(tempMonkey) {
     case (newMonkeys, (n, m)) =>
       newMonkeys.updated(n, convertItem(m, divisors)
@@ -155,7 +155,7 @@ object Day11B extends App {
 
   val finalMonkeys =
     (0 until 10000).foldLeft(monkeyStart) {
-      case (monkeys, _) =>
+      case (monkeys, round) =>
         monkeys.keys.toSeq.sorted.foldLeft(monkeys) {
           case (map, num) =>
             val monk = map.getOrElse(num, Monkey.empty)
