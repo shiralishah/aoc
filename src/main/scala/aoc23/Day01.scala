@@ -12,7 +12,7 @@ object Day01A extends ZIOAppDefault {
     .exitCode
 
   def program = ZIO.scoped {
-    FileHelper.fileStreamLn("run.txt").map{ line =>
+    IOHelper.fileStreamLn("run.txt").map{ line =>
       val digits = line.filter(_.isDigit)
       s"${digits.head}${digits.last}".toLong
     } >>> ZSink.sum[Long]
@@ -37,7 +37,7 @@ object Day01B extends ZIOAppDefault {
     .exitCode
 
   def program = ZIO.scoped {
-    FileHelper.fileStreamLn("run.txt").map { line =>
+    IOHelper.fileStreamLn("run.txt").map { line =>
       @tailrec
       def search(ind: Int, f: (String, Int) => (String, Char)): String = {
         val (acc, c) = f(line, ind)

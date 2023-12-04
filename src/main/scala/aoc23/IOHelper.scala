@@ -6,7 +6,7 @@ import zio.stream.{ZPipeline, ZSink, ZStream}
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption.{CREATE, WRITE}
 
-object FileHelper {
+object IOHelper {
 
   val path = (fileName: String) => s"src/main/resources/aoc23/$fileName"
 
