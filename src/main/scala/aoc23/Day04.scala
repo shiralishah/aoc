@@ -23,20 +23,25 @@ object Day04A extends ZIOAppDefault {
 
 object Day04B extends App {
   val input = scala.io.Source.fromResource("aoc23/run.txt").getLines().toSeq
-  val allCards = input.foldLeft(Seq.empty[Int]){
+  val allCards = input.foldLeft(Map.empty[Int, Int]){
     case (cards, card) =>
       card match {
         case s"Card $c: $a|$b" =>
           val n = c.strip.toInt
-          val updatedCards = cards :+ n
           val winningNums = a.split(' ').filterNot(_.isEmpty)
           val myNums = b.split(' ').filterNot(_.isEmpty)
           val numOfWins = myNums.count(winningNums.contains)
-          val newCards = (n+1 to n+numOfWins)
-          val numOfCards = updatedCards.count(_ == n)
-          updatedCards :++ (Seq.fill(numOfCards)(newCards).flatten)
+          val updatedCards = update(cards, n)
+          val numOfCards = updatedCards.getOrElse(n, 0)
+          (n+1 to n+numOfWins).foldLeft(updatedCards){
+            case (acc, i) => update(acc, i, numOfCards)
+          }
       }
   }
-  val totalNum = allCards.size
+  def update(map: Map[Int, Int], k: Int, n: Int = 1) =
+    map.get(k).fold(map + (k -> n)) {
+      v => map + (k -> (v + n))
+    }
+  val totalNum = allCards.values.sum
   println(totalNum)
 }
