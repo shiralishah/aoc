@@ -1,28 +1,127 @@
 package aoc22
 
-case class Valve(label: String, rate: Int, neigbors: Set[String]) {
-  def cost(minutes: Int): Int = rate * minutes
+
+case class Valve(label: String, rate: Int, neighbors: Seq[String], isOpen: Boolean = false) {
+  def pressure(minutes: Int): Int = rate * minutes
 }
 
 object Day16A extends App {
-  val input = scala.io.Source.fromResource("aoc22/test2.txt").getLines().toSeq
+  val input = scala.io.Source.fromResource("aoc22/run.txt").getLines().toSeq
 
-  val startingValves = input.map {
-    _ match {
-      case s"Valve $label has flow rate=$rate; tunnels lead to valves $neighbors" =>
-        Valve(label, rate.toInt, neighbors.split(", ").toSet)
+  val valveMap = input.map {
+    case s"Valve $label has flow rate=$rate; tunnels lead to valves $neighbors" =>
+      (label -> Valve(label, rate.toInt, neighbors.split(", ").toSeq))
+    case s"Valve $label has flow rate=$rate; tunnel leads to valve $neighbor" =>
+      (label -> Valve(label, rate.toInt, Seq(neighbor)))
+  }.toMap
+
+  val positiveValves = valveMap.collect{
+    case(k, v) if v.rate > 0 => k
+  }.toSet
+  val distances = valveMap.keys.map(k => (k -> findPaths(valveMap, k))).toMap
+
+  val finalPaths = search("AA", 30)
+  val maxValue = finalPaths.values.max
+  println(maxValue)
+
+
+  def findPaths(valves: Map[String, Valve], start: String): Map[String, Int] = {
+
+    val queue = collection.mutable.Queue(start)
+    val dist = collection.mutable.Map(start -> 1)
+
+    while (queue.nonEmpty) {
+      val current = queue.dequeue()
+      valves(current).neighbors.filterNot(dist.contains).foreach { n =>
+        queue.enqueue(n)
+        dist(n) = dist(current) + 1
+      }
     }
+    dist.toMap
   }
-  val nonZero = startingValves.filterNot(_.rate == 0)
 
-  val adj = startingValves.map(v => v -> v.neigbors.map(n => startingValves.find(_.label == n).get)).toMap
+  def search(start: String, initial: Int): Map[Set[String], Int]= {
+    val values = collection.mutable.Map[Set[String], Int]().withDefaultValue(0)
 
-  val start = startingValves.find(_.label == "AA").get
+    def move(queue: Set[String], completed: Set[String], from: String, time: Int, pressure: Int): Unit = {
+      values(completed) = values(completed).max(pressure)
 
-  println(42)
-  // dijkstra again
-  // start at AA, get max spanning tree to all other valves from start
-  // cost is remaining minutes*rate
-  // choose max path from AA
-  // run it again from new starting point (until time is out) - optimization until we've selected all nonzero valves
+      for (n <- queue) {
+        val rem = time - distances(from)(n)
+        val press = if (rem > 0) {
+          valveMap(n).pressure(rem)
+        } else 0
+        move(queue - n, completed + n, n, rem, pressure + press)
+      }
+    }
+
+    move(positiveValves, Set(), start, initial, 0)
+    values.toMap
+  }
+
+
+}
+
+
+object Day16B extends App {
+  val input = scala.io.Source.fromResource("aoc22/test.txt").getLines().toSeq
+
+  val valveMap = input.map {
+    case s"Valve $label has flow rate=$rate; tunnels lead to valves $neighbors" =>
+      (label -> Valve(label, rate.toInt, neighbors.split(", ").toSeq))
+    case s"Valve $label has flow rate=$rate; tunnel leads to valve $neighbor" =>
+      (label -> Valve(label, rate.toInt, Seq(neighbor)))
+  }.toMap
+
+  val positiveValves = valveMap.collect{
+    case(k, v) if v.rate > 0 => k
+  }.toSet
+  val distances = valveMap.keys.map(k => (k -> findPaths(valveMap, k))).toMap
+
+  val finalPaths = search("AA", 26)
+  val bothMax = (for {
+    (a, b) <- finalPaths
+    (x, y) <- finalPaths
+  } yield {
+    if (a.intersect(x).isEmpty) b+y else 0
+  }).max
+
+  println(bothMax)
+
+
+  def findPaths(valves: Map[String, Valve], start: String): Map[String, Int] = {
+
+    val queue = collection.mutable.Queue(start)
+    val dist = collection.mutable.Map(start -> 1)
+
+    while (queue.nonEmpty) {
+      val current = queue.dequeue()
+      valves(current).neighbors.filterNot(dist.contains).foreach { n =>
+        queue.enqueue(n)
+        dist(n) = dist(current) + 1
+      }
+    }
+    dist.toMap
+  }
+
+  def search(start: String, initial: Int): Map[Set[String], Int]= {
+    val values = collection.mutable.Map[Set[String], Int]().withDefaultValue(0)
+
+    def move(queue: Set[String], completed: Set[String], from: String, time: Int, pressure: Int): Unit = {
+      values(completed) = values(completed).max(pressure)
+
+      for (n <- queue) {
+        val rem = time - distances(from)(n)
+        val press = if (rem > 0) {
+          valveMap(n).pressure(rem)
+        } else 0
+        move(queue - n, completed + n, n, rem, pressure + press)
+      }
+    }
+
+    move(positiveValves, Set(), start, initial, 0)
+    values.toMap
+  }
+
+
 }
