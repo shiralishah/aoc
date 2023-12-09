@@ -7,7 +7,7 @@ object HelloWorld extends ZIOAppDefault {
     .tapErrorCause(ZIO.logErrorCause(_)).exitCode
 
   def program = ZIO.scoped {
-    IOHelper.fileStream("test.txt").run(IOHelper.fileSink("output.txt"))
+    IOHelper.fileStream("test.txt") >>> (IOHelper.fileSink("output.txt"))
   }
 
 }
