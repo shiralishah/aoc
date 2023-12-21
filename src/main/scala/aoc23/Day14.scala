@@ -1,7 +1,5 @@
 package aoc23
 
-import aoc23.Day14B.{cycleN, getSupport, input}
-
 import scala.annotation.tailrec
 
 object Day14A extends App {
